@@ -41,6 +41,7 @@ mcp = FastMCP(
     6. export_for_unreal("output.fbx") — export for Unreal Engine
 
     TOOLS BY LEVEL:
+    - Photo: reconstruct_face_from_photo, analyze_face_photo, compare_face_to_photo
     - High-level: edit_facial_feature, edit_face_natural, apply_face_preset
     - Mid-level: move_bone, scale_bone, rotate_bone
     - Shape keys: set_shape_key, list_shape_keys
@@ -61,12 +62,14 @@ from mcp_server.tools.bone_tools import register_bone_tools
 from mcp_server.tools.shape_key_tools import register_shape_key_tools
 from mcp_server.tools.scene_tools import register_scene_tools
 from mcp_server.tools.preset_tools import register_preset_tools
+from mcp_server.tools.photo_tools import register_photo_tools
 
 register_face_tools(mcp, _get_connection)
 register_bone_tools(mcp, _get_connection)
 register_shape_key_tools(mcp, _get_connection)
 register_scene_tools(mcp, _get_connection)
 register_preset_tools(mcp, _get_connection)
+register_photo_tools(mcp, _get_connection)
 
 logger.info("All tools registered. Server ready.")
 

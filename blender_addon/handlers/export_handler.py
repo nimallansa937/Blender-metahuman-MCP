@@ -98,12 +98,24 @@ def handle_render_preview(params):
             break
 
     if not camera:
-        # Create a temporary camera
-        bpy.ops.object.camera_add()
-        camera = bpy.context.active_object
-        camera.name = "MCP_Preview_Camera"
+        # Create a temporary camera using data API (no operator context needed)
+        cam_data = bpy.data.cameras.new(name="MCP_Preview_Cam")
+        cam_data.lens = 85  # Portrait lens
+        camera = bpy.data.objects.new("MCP_Preview_Camera", cam_data)
+        bpy.context.collection.objects.link(camera)
 
     scene.camera = camera
+
+    # Ensure we have a light for rendering
+    has_light = any(obj.type == "LIGHT" for obj in scene.objects)
+    if not has_light:
+        light_data = bpy.data.lights.new(name="MCP_Preview_Light", type="AREA")
+        light_data.energy = 100
+        light_data.size = 0.5
+        light_obj = bpy.data.objects.new("MCP_Preview_Light", light_data)
+        bpy.context.collection.objects.link(light_obj)
+        light_obj.location = (0.3, -0.5, 2.0)
+        light_obj.rotation_euler = (math.radians(30), 0, math.radians(10))
 
     # Find the head/face center for aiming
     target_loc = (0, 0, 1.6)  # Default head height
