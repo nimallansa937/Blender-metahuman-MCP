@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "blender-metahuman": {
+      "command": "python",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": "C:\\Users\\chari\\blender-metahuman-mcp",
+      "env": {
+        "BLENDER_HOST": "127.0.0.1",
+        "BLENDER_PORT": "9876"
+      }
+    }
+  }
+}

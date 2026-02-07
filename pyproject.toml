@@ -1,0 +1,17 @@
+[project]
+name = "blender-metahuman-mcp"
+version = "0.1.0"
+description = "MCP bridge for editing MetaHuman facial features in Blender via Claude Code"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+dependencies = [
+    "mcp>=1.4.1",
+]
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+blender-metahuman-mcp = "mcp_server.server:main"
