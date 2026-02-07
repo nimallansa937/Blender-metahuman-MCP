@@ -1,10 +1,10 @@
 """
 Face Landmark Detection
 
-Uses Google MediaPipe FaceMesh to detect 478 facial landmarks
+Uses Google MediaPipe FaceLandmarker (Tasks API) to detect 478 facial landmarks
 from a single 2D photo. Returns normalized (x, y, z) coordinates.
 
-MediaPipe FaceMesh coordinates:
+MediaPipe FaceLandmarker coordinates:
   - x, y: Normalized to [0.0, 1.0] by image dimensions
   - z: Depth estimate (head center = origin, smaller = closer to camera)
   - z scale is roughly comparable to x/y
@@ -12,12 +12,35 @@ MediaPipe FaceMesh coordinates:
 
 import os
 import logging
+import urllib.request
 
 logger = logging.getLogger("face_reconstruction.landmark_detector")
 
+# Path to the face landmarker model (auto-downloaded on first use)
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "face_landmarker.task")
+MODEL_URL = (
+    "https://storage.googleapis.com/mediapipe-models/"
+    "face_landmarker/face_landmarker/float16/1/face_landmarker.task"
+)
+
+
+def _ensure_model():
+    """Download the face landmarker model if it doesn't exist."""
+    if os.path.isfile(MODEL_PATH):
+        return True
+    try:
+        logger.info(f"Downloading face landmarker model ({MODEL_URL})...")
+        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+        size_mb = os.path.getsize(MODEL_PATH) / (1024 * 1024)
+        logger.info(f"Downloaded face landmarker model ({size_mb:.1f} MB)")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to download model: {e}")
+        return False
+
 
 def detect_face_landmarks(image_path: str) -> dict:
-    """Detect 478 face landmarks from a photo using MediaPipe FaceMesh.
+    """Detect 478 face landmarks from a photo using MediaPipe FaceLandmarker.
 
     Args:
         image_path: Absolute path to a face photo (JPG, PNG, BMP, etc.).
@@ -48,48 +71,52 @@ def detect_face_landmarks(image_path: str) -> dict:
             f"Supported: {', '.join(sorted(supported_ext))}"
         )
 
-    # Import dependencies (lazy to avoid import errors if not installed)
-    try:
-        import cv2
-    except ImportError:
+    # Ensure model is downloaded
+    if not _ensure_model():
         return _error_result(
-            "OpenCV not installed. Run: pip install opencv-python"
+            f"Face landmarker model not found at {MODEL_PATH} and auto-download failed. "
+            f"Download manually from: {MODEL_URL}"
         )
 
+    # Import dependencies (lazy to avoid import errors if not installed)
     try:
         import mediapipe as mp
+        from mediapipe.tasks.python import BaseOptions, vision
     except ImportError:
         return _error_result(
             "MediaPipe not installed. Run: pip install mediapipe"
         )
 
-    # Load image
-    image = cv2.imread(image_path)
-    if image is None:
+    # Load image using MediaPipe's own Image class
+    try:
+        mp_image = mp.Image.create_from_file(image_path)
+        image_width = mp_image.width
+        image_height = mp_image.height
+    except Exception as e:
         return _error_result(
             f"Could not read image: {image_path}. "
-            "The file may be corrupted or in an unsupported format."
+            f"Error: {e}"
         )
 
-    image_height, image_width = image.shape[:2]
     logger.info(f"Loaded image: {image_width}x{image_height} from {image_path}")
 
-    # Convert BGR to RGB for MediaPipe
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    # Configure FaceLandmarker
+    options = vision.FaceLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path=MODEL_PATH),
+        running_mode=vision.RunningMode.IMAGE,
+        num_faces=1,
+        min_face_detection_confidence=0.5,
+        min_face_presence_confidence=0.5,
+        output_face_blendshapes=False,
+        output_facial_transformation_matrixes=False,
+    )
 
-    # Run FaceMesh
-    mp_face_mesh = mp.solutions.face_mesh
-
-    with mp_face_mesh.FaceMesh(
-        static_image_mode=True,
-        max_num_faces=1,
-        refine_landmarks=True,  # 478 landmarks (includes iris)
-        min_detection_confidence=0.5,
-    ) as face_mesh:
-        results = face_mesh.process(image_rgb)
+    # Run detection
+    with vision.FaceLandmarker.create_from_options(options) as landmarker:
+        result = landmarker.detect(mp_image)
 
     # Check if face was detected
-    if not results.multi_face_landmarks:
+    if not result.face_landmarks or len(result.face_landmarks) == 0:
         return _error_result(
             "No face detected in the image. Tips:\n"
             "  - Use a front-facing photo with the face clearly visible\n"
@@ -99,17 +126,16 @@ def detect_face_landmarks(image_path: str) -> dict:
         )
 
     # Extract landmarks from the first detected face
-    face_landmarks = results.multi_face_landmarks[0]
+    face_landmarks = result.face_landmarks[0]
     landmarks = []
 
-    for lm in face_landmarks.landmark:
+    for lm in face_landmarks:
         landmarks.append((lm.x, lm.y, lm.z))
 
-    # Estimate detection confidence (MediaPipe doesn't expose this directly,
-    # so we use a heuristic based on landmark spread and consistency)
+    # Estimate detection confidence
     confidence = _estimate_confidence(landmarks, image_width, image_height)
 
-    num_faces = len(results.multi_face_landmarks)
+    num_faces = len(result.face_landmarks)
     if num_faces > 1:
         logger.warning(f"Multiple faces detected ({num_faces}), using the first one")
 
@@ -150,7 +176,7 @@ def _estimate_confidence(landmarks, image_width, image_height):
     coverage_score = min(1.0, face_area / 0.05)
 
     # Check that landmarks are within bounds (some small overflow is ok)
-    in_bounds = sum(1 for x, y, z in landmarks if 0 <= x <= 1 and 0 <= y <= 1)
+    in_bounds = sum(1 for x, y, z in landmarks if -0.05 <= x <= 1.05 and -0.05 <= y <= 1.05)
     bounds_score = in_bounds / len(landmarks)
 
     # Check rough symmetry using eye landmarks

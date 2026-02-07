@@ -36,6 +36,9 @@ unreal_export/
 # Rendered images
 preview_*.png
 
+# MediaPipe model files (auto-downloaded)
+*.task
+
 # Temp files
 *.tmp
 *.bak
