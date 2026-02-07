@@ -25,6 +25,17 @@ Thumbs.db
 # Pytest
 .pytest_cache/
 
+# Blender
+*.blend
+*.blend1
+
+# 3D assets / exports
+*.fbx
+unreal_export/
+
+# Rendered images
+preview_*.png
+
 # Temp files
 *.tmp
 *.bak
