@@ -35,6 +35,12 @@ unreal_export/
 
 # Rendered images
 preview_*.png
+bernice_*.png
+
+# UE-exported textures & assets
+MI_*.png
+M_*.png
+ABP_*.T3D
 
 # MediaPipe model files (auto-downloaded)
 *.task

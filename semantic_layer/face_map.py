@@ -23,17 +23,17 @@ Each operation defines:
 
 BONE_ALIAS_MAPS = {
     "metahuman": {
-        # Nose
+        # Nose — verified against Bernice_FaceMesh rig
         "nose_bridge": "FACIAL_C_NoseBridge",
         "nose_tip": "FACIAL_C_NoseTip",
-        "nose_L": "FACIAL_L_NoseNostril",
-        "nose_R": "FACIAL_R_NoseNostril",
-        "nostril_L": "FACIAL_L_NasolabialBulge",
-        "nostril_R": "FACIAL_R_NasolabialBulge",
+        "nose_L": "FACIAL_L_Nostril",
+        "nose_R": "FACIAL_R_Nostril",
+        "nostril_L": "FACIAL_L_NostrilThickness1",
+        "nostril_R": "FACIAL_R_NostrilThickness1",
         # Jaw
         "jaw": "FACIAL_C_Jaw",
-        "jaw_L": "FACIAL_L_JawRecess",
-        "jaw_R": "FACIAL_R_JawRecess",
+        "jaw_L": "FACIAL_L_Jawline",
+        "jaw_R": "FACIAL_R_Jawline",
         "chin": "FACIAL_C_Chin",
         "chin_L": "FACIAL_L_ChinSide",
         "chin_R": "FACIAL_R_ChinSide",
@@ -45,15 +45,15 @@ BONE_ALIAS_MAPS = {
         "eyelid_lower_L": "FACIAL_L_EyelidLowerA",
         "eyelid_lower_R": "FACIAL_R_EyelidLowerA",
         # Brows
-        "brow_inner_L": "FACIAL_L_BrowInner",
-        "brow_inner_R": "FACIAL_R_BrowInner",
-        "brow_mid_L": "FACIAL_L_BrowMid",
-        "brow_mid_R": "FACIAL_R_BrowMid",
-        "brow_outer_L": "FACIAL_L_BrowOuter",
-        "brow_outer_R": "FACIAL_R_BrowOuter",
+        "brow_inner_L": "FACIAL_L_ForeheadIn",
+        "brow_inner_R": "FACIAL_R_ForeheadIn",
+        "brow_mid_L": "FACIAL_L_ForeheadMid",
+        "brow_mid_R": "FACIAL_R_ForeheadMid",
+        "brow_outer_L": "FACIAL_L_ForeheadOut",
+        "brow_outer_R": "FACIAL_R_ForeheadOut",
         # Lips
-        "lip_upper_mid": "FACIAL_C_LipUpperMid",
-        "lip_lower_mid": "FACIAL_C_LipLowerMid",
+        "lip_upper_mid": "FACIAL_C_LipUpper",
+        "lip_lower_mid": "FACIAL_C_LipLower",
         "lip_corner_L": "FACIAL_L_LipCorner",
         "lip_corner_R": "FACIAL_R_LipCorner",
         "lip_upper_L": "FACIAL_L_LipUpperOuter",
@@ -61,14 +61,14 @@ BONE_ALIAS_MAPS = {
         "lip_lower_L": "FACIAL_L_LipLowerOuter",
         "lip_lower_R": "FACIAL_R_LipLowerOuter",
         # Cheeks
-        "cheek_L": "FACIAL_L_CheekboneMid",
-        "cheek_R": "FACIAL_R_CheekboneMid",
-        "cheek_upper_L": "FACIAL_L_CheekboneUpper",
-        "cheek_upper_R": "FACIAL_R_CheekboneUpper",
+        "cheek_L": "FACIAL_L_CheekOuter",
+        "cheek_R": "FACIAL_R_CheekOuter",
+        "cheek_upper_L": "FACIAL_L_CheekInner",
+        "cheek_upper_R": "FACIAL_R_CheekInner",
         # Forehead
-        "forehead_mid": "FACIAL_C_ForeheadMid",
-        "forehead_L": "FACIAL_L_ForeheadInner",
-        "forehead_R": "FACIAL_R_ForeheadInner",
+        "forehead_mid": "FACIAL_C_Forehead",
+        "forehead_L": "FACIAL_L_ForeheadIn",
+        "forehead_R": "FACIAL_R_ForeheadIn",
         # Ears
         "ear_L": "FACIAL_L_Ear",
         "ear_R": "FACIAL_R_Ear",
